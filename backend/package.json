@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "dev": "nodemon index.js"
-  },
+ "scripts": {
+  "start": "node src/app.js",
+  "dev": "nodemon src/app.js"
+}
+,
   "keywords": [],
   "author": "",
   "license": "ISC",
