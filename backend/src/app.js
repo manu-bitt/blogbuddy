@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import connectDB from './config/db.js'
 import blogRoutes from '../routes/blogRoutes.js'
 import authRoutes from "../routes/authRoutes.js";
+import aiRoutes from '../routes/aiRoutes.js'
 dotenv.config()
 const app = express()
 
@@ -16,6 +17,8 @@ app.use(express.json())
 app.use("/api/auth",authRoutes);
 
 app.use("/api/blogs", blogRoutes);
+
+app.use('/api/ai',aiRoutes);
 
 
 app.get('/',(req,res)=>{

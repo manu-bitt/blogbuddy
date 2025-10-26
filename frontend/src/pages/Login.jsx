@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import API from "../api";
 import { useNavigate } from "react-router-dom";
+import API from "../api";
+import "./Login.css"; // New CSS file
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,39 +12,49 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await API.post("/api/auth/login", { email, password });
-      localStorage.setItem("token", res.data.token); 
+      localStorage.setItem("token", res.data.token);
+
       alert("Login successful!");
-      navigate("/"); 
+      setTimeout(() => navigate("/home"), 100);
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err);
       alert(err.response?.data?.message || "Invalid credentials");
     }
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Login</h2>
-      <form onSubmit={handleSubmit} className="space-y-2">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border p-2 w-full"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 w-full"
-          required
-        />
-        <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-          Login
-        </button>
-      </form>
+    <div className="lb-login">
+      <div className="lb-login-card">
+        <h2 className="lb-login-title">Welcome Back</h2>
+        <p className="lb-login-sub">Login to access your AI-powered blogs</p>
+        <form onSubmit={handleSubmit} className="lb-login-form">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="lb-input"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="lb-input"
+            required
+          />
+          <button type="submit" className="lb-btn-primary">
+            Login
+          </button>
+        </form>
+        <p className="lb-login-footer">
+          Don’t have an account?{" "}
+          <span className="lb-login-link" onClick={() => navigate("/register")}>
+            Register
+          </span>
+        </p>
+      </div>
     </div>
   );
 };

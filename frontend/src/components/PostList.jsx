@@ -1,115 +1,65 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
+import "./PostList.css";
 
-const PostList = ({ posts, onUpdatePost, onDeletePost }) => {
-  const [editingId, setEditingId] = useState(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
+const pastelColors = ["#FFFA87", "#FFB3BA", "#BAFFC9", "#BAE1FF", "#FFDBAC"];
 
-  const startEditing = (post) => {
-    setEditingId(post._id);
-    setEditTitle(post.title);
-    setEditContent(post.content);
+const PostList = ({ posts, onDeletePost }) => {
+  const navigate = useNavigate();
+
+  const handleClick = (id) => {
+    navigate(`/edit/${id}`);
   };
 
-  const cancelEditing = () => {
-    setEditingId(null);
-    setEditTitle("");
-    setEditContent("");
-  };
-
-  const saveEdit = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("You must login first");
-        return;
-      }
-
-      const res = await API.put(
-        `/api/blogs/${id}`,
-        { title: editTitle, content: editContent },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      onUpdatePost(res.data); // Call the parent function to update state
-      cancelEditing();
-    } catch (err) {
-      console.error("Error updating post:", err);
-    }
-  };
-
-  const deletePost = async (id) => {
+  const handleDelete = async (e, id) => {
+    e.stopPropagation(); // prevent triggering note click
     const token = localStorage.getItem("token");
-    if (!token) {
-      alert("You must login first");
-      return;
-    }
-
+    if (!token) return alert("Please login first.");
     try {
       await API.delete(`/api/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      onDeletePost(id); // Call parent function to remove post from state
+      onDeletePost(id);
     } catch (err) {
       console.error("Error deleting post:", err);
+      alert("Failed to delete post.");
     }
   };
 
-  if (!posts || posts.length === 0) return <p>No posts available.</p>;
+  if (!posts || posts.length === 0)
+    return <p className="no-posts">No posts available.</p>;
 
   return (
-    <div className="space-y-4">
-      {posts.map((post) => (
-        <div key={post._id} className="border p-4 rounded">
-          {editingId === post._id ? (
-            <div>
-              <input
-                className="border p-2 w-full mb-2"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-              />
-              <textarea
-                className="border p-2 w-full mb-2"
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-              />
+    <div className="postlist-container">
+      {posts.map((post) => {
+        const bgColor =
+          pastelColors[Math.floor(Math.random() * pastelColors.length)];
+
+        return (
+          <div
+            key={post._id}
+            className="post-note"
+            style={{ backgroundColor: bgColor, cursor: "pointer" }}
+            onClick={() => handleClick(post._id)}
+          >
+            <div className="note-header">
+              <h3 className="note-title">{post.title}</h3>
               <button
-                className="bg-green-500 text-white px-3 py-1 mr-2 rounded"
-                onClick={() => saveEdit(post._id)}
+                className="note-delete-btn"
+                onClick={(e) => handleDelete(e, post._id)}
               >
-                Save
-              </button>
-              <button
-                className="bg-gray-400 text-white px-3 py-1 rounded"
-                onClick={cancelEditing}
-              >
-                Cancel
+                🗑️
               </button>
             </div>
-          ) : (
-            <div>
-              <h2 className="text-xl font-semibold">{post.title}</h2>
-              <p>{post.content}</p>
-              <div className="mt-2 space-x-2">
-                <button
-                  className="bg-yellow-400 text-white px-3 py-1 rounded"
-                  onClick={() => startEditing(post)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="bg-red-500 text-white px-3 py-1 rounded"
-                  onClick={() => deletePost(post._id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
+            <p className="note-snippet">
+              {post.content.length > 50
+                ? post.content.substring(0, 50) + "..."
+                : post.content}
+            </p>
+          </div>
+        );
+      })}
     </div>
   );
 };

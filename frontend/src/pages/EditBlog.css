@@ -1,0 +1,44 @@
+.editblog-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  font-family: 'Patrick Hand', cursive;
+  background-color: #fff;
+}
+
+.editblog-container h2 {
+  margin-bottom: 1rem;
+}
+
+.edit-title, .edit-content {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1rem;
+}
+
+.edit-content {
+  min-height: 200px;
+  resize: vertical;
+}
+
+.save-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #FFB3BA;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+  background-color: #FF9AA2;
+  transform: scale(1.05);
+}
+

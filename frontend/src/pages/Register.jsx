@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api";
+import "./Register.css"; // Import the new CSS
 
 const Register = () => {
   const navigate = useNavigate();
@@ -37,38 +38,53 @@ const Register = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Register</h2>
-      {error && <p className="text-red-500 mb-2">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="border p-2 w-full rounded"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border p-2 w-full rounded"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 w-full rounded"
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded w-full"
-        >
-          Register
-        </button>
-      </form>
+    <div className="lb-register">
+      <div className="lb-register-card">
+        <h2 className="lb-register-title">Welcome Buddy</h2>
+        <p className="lb-register-sub">Create your account to get started</p>
+
+        {error && <p className="text-red-500 mb-2">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="lb-register-form">
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="lb-input"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="lb-input"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="lb-input"
+            required
+          />
+          <button type="submit" className="lb-btn-primary">
+            Register
+          </button>
+        </form>
+
+        <div className="lb-register-footer">
+          Already have an account?{" "}
+          <span
+            className="lb-register-link"
+            onClick={() => navigate("/login")}
+          >
+            Sign In
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

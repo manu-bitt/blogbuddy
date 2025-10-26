@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import API from "../api";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import "./CreatePost.css";
 
-const CreatePost = ({ onPostCreated }) => {
+const CreateBlog = ({ onBlogCreated }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
@@ -25,42 +26,48 @@ const CreatePost = ({ onPostCreated }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      onPostCreated(res.data);
+      onBlogCreated(res.data);
       setTitle("");
       setContent("");
       setTags("");
     } catch (err) {
-      console.error("Error creating post:", err);
+      console.error("Error creating blog:", err);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 p-4 border rounded">
-      <input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="border p-2 w-full mb-2"
-      />
-      <textarea
-        placeholder="Content"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        className="border p-2 w-full mb-2"
-      />
-      <input
-        type="text"
-        placeholder="Tags (comma separated)"
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
-        className="border p-2 w-full mb-2"
-      />
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-        Create Post
-      </button>
-    </form>
+    <div className="notes-card">
+      <h2 className="notes-title">📝 Create a Blog</h2>
+      <form onSubmit={handleSubmit} className="notes-form">
+        <input
+          type="text"
+          placeholder="Blog Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="notes-input"
+          required
+        />
+        <textarea
+          placeholder="Write your blog content here..."
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="notes-textarea"
+          rows={8}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Tags (comma separated)"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          className="notes-input"
+        />
+        <button type="submit" className="notes-btn">
+          Create Blog
+        </button>
+      </form>
+    </div>
   );
 };
 
-export default CreatePost;
+export default CreateBlog;

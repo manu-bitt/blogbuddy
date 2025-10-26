@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Poppins:wght@400;500&display=swap');
+
+.notes-card {
+  background: #fff9c4; /* soft sticky note yellow */
+  max-width: 700px;    /* bigger width */
+  width: 90%;
+  margin: 40px auto;   /* more spacing from top */
+  padding: 40px 35px;  /* more padding for a spacious feel */
+  border-radius: 20px; /* slightly rounder edges */
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  font-family: 'Patrick Hand', cursive;
+  position: relative;
+  transform: rotate(-0.5deg); /* subtle tilt */
+  transition: transform 0.2s ease;
+}
+
+.notes-card:hover {
+  transform: rotate(0deg);
+}
+
+.notes-title {
+  font-size: 36px; /* bigger title */
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: #444;
+}
+
+.notes-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* more spacing between fields */
+}
+
+.notes-input {
+  padding: 14px 16px;  /* bigger input padding */
+  font-size: 18px;     /* bigger text */
+  border: none;
+  border-bottom: 2px dashed #d1c27f;
+  background: transparent;
+  outline: none;
+  color: #333;
+  font-family: 'Patrick Hand', cursive;
+}
+
+.notes-input::placeholder {
+  color: #888;
+  font-style: italic;
+}
+
+.notes-textarea {
+  padding: 14px 16px;
+  font-size: 18px;
+  border: none;
+  border-bottom: 2px dashed #d1c27f;
+  background: transparent;
+  outline: none;
+  resize: vertical;
+  color: #333;
+  font-family: 'Patrick Hand', cursive;
+}
+
+.notes-textarea::placeholder {
+  color: #888;
+  font-style: italic;
+}
+
+.notes-btn {
+  padding: 14px 0;   /* bigger button */
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  color: white;
+  font-weight: bold;
+  font-size: 18px;   /* bigger text */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notes-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}

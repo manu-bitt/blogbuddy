@@ -21,22 +21,38 @@ export const getBlogById = async (req, res) => {
   }
 };
 
-// Create blog
-export const createBlog = async (req, res) => {
-  const { title, content, tags } = req.body;
-  const userId = req.user._id; 
-
-  if (!title || !content) {
-    return res.status(400).json({ message: "Please provide title and content" });
-  }
-
+export const getBlogsByUser = async (req, res) => {
   try {
-    const blog = await Blog.create({ title, content, userId, tags });
-    res.status(201).json(blog);
-  } catch (error) {
-    res.status(500).json({ message: "Error creating blog", error: error.message });
+    const userId = req.params.userId;
+    const blogs = await Blog.find({ userId }).sort({ createdAt: -1 }); // latest first
+    res.status(200).json(blogs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch user blogs" });
   }
 };
+
+// Create blog
+
+export const createBlog = async (req, res) => {
+  const { title, content, tags = [] } = req.body;
+  try {
+    if (!req.user) return res.status(401).json({ message: "Not authorized" });
+
+    const blog = await Blog.create({
+      userId: req.user._id, // from middleware
+      title,
+      content,
+      tags,
+    });
+
+    res.status(201).json(blog);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to create post" });
+  }
+};
+
 
 
 // Update blog
@@ -54,6 +70,7 @@ export const updateBlog = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Delete blog
 export const deleteBlog = async (req, res) => {

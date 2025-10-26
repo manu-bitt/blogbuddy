@@ -1,0 +1,563 @@
+frontend/src/pages/AIGenerator.jsx
+
+
+import React, { useState } from "react";
+import API from "../api"; // axios instance with baseURL
+
+const AIGenerator = ({ onNewPost }) => {
+  const [topic, setTopic] = useState("");
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [tone, setTone] = useState("informative");
+
+  // Generate AI blog
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+    if (!topic.trim()) return alert("Please enter a topic.");
+
+    setLoading(true);
+    setContent("");
+    try {
+      const res = await API.post("/api/ai/generate", { topic, tone, maxTokens: 700 });
+      setContent(res.data.content || "AI returned empty content.");
+    } catch (err) {
+      console.error("AI generation error:", err);
+      alert(err.response?.data?.message || "Failed to generate blog. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Save generated blog
+  const handleSave = async () => {
+    if (!content.trim()) return alert("No content to save.");
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Please login before saving.");
+
+    try {
+      const res = await API.post(
+        "/api/blogs",
+        { title: topic.trim(), content, tags: [] },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Saved successfully!");
+      setTopic("");
+      setContent("");
+      if (onNewPost) onNewPost(res.data); // optional: update parent list
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert(err.response?.data?.message || "Failed to save post.");
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">AI Blog Generator</h1>
+
+      <form onSubmit={handleGenerate} className="space-y-3">
+        <input
+          type="text"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="Enter blog topic, e.g. 'AI in Healthcare'"
+          className="border p-2 w-full rounded"
+          required
+        />
+        <select
+          value={tone}
+          onChange={(e) => setTone(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="informative">Informative</option>
+          <option value="casual">Casual</option>
+          <option value="professional">Professional</option>
+          <option value="funny">Funny</option>
+        </select>
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          {loading ? "Generating..." : "Generate Blog"}
+        </button>
+      </form>
+
+      {content && (
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-2">Generated Blog</h2>
+          <div className="border rounded p-4 bg-gray-50 whitespace-pre-wrap">{content}</div>
+          <div className="mt-3 space-x-2">
+            <button
+              onClick={handleSave}
+              className="bg-green-600 text-white px-4 py-1 rounded"
+            >
+              Save as Post
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AIGenerator;
+
+
+
+frontend/src/pages/Home.jsx
+
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../api";
+import CreatePost from "../components/CreatePost";
+import PostList from "../components/PostList";
+
+const Home = () => {
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
+
+  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await API.get("/api/blogs");
+        setPosts(res.data);
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+      }
+    };
+    fetchPosts();
+  }, []);
+
+
+  const handleNewPost = (newPost) => {
+    setPosts([newPost, ...posts]);
+  };
+
+  
+  const handleUpdatePost = (updatedPost) => {
+    setPosts(posts.map((p) => (p._id === updatedPost._id ? updatedPost : p)));
+  };
+
+  
+  const handleDeletePost = (id) => {
+    setPosts(posts.filter((p) => p._id !== id));
+  };
+
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Home - Blog Posts</h1>
+      <CreatePost onPostCreated={handleNewPost} />
+      <PostList
+        posts={posts}
+        onUpdatePost={handleUpdatePost}
+        onDeletePost={handleDeletePost}
+      />
+    </div>
+  );
+};
+
+export default Home;
+
+frontend/src/pages/Landing.jsx
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
+const Landing = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="p-4">
+      <h1 className="text-3xl font-bold mb-4">Welcome to BlogBuddy</h1>
+      <p className="mb-6">Please login or register to continue.</p>
+      <div className="space-x-4">
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={() => navigate("/login")}
+        >
+          Login
+        </button>
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded"
+          onClick={() => navigate("/register")}
+        >
+          Register
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Landing;
+
+frontend/src/pages/Login.jsx
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../api";
+
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await API.post("/api/auth/login", { email, password });
+      localStorage.setItem("token", res.data.token);
+
+      alert("Login successful!");
+      // Add a short delay to prevent alert from blocking navigation
+      setTimeout(() => navigate("/home"), 100);
+    } catch (err) {
+      console.error("Login error:", err);
+      alert(err.response?.data?.message || "Invalid credentials");
+    }
+  };
+
+  return (
+    <div className="p-4 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border p-2 w-full rounded"
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="border p-2 w-full rounded"
+          required
+        />
+        <button
+          type="submit"
+          className="bg-green-500 text-white px-4 py-2 rounded w-full hover:bg-green-600 transition"
+        >
+          Login
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default Login;
+
+
+frontend/src/pages/Register.jsx
+
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../api";
+
+const Register = () => {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (!name || !email || !password) {
+      setError("All fields are required");
+      return;
+    }
+
+    try {
+      const res = await API.post("/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      // Save token to localStorage
+      localStorage.setItem("token", res.data.token);
+
+      // Redirect to home
+      navigate("/home");
+    } catch (err) {
+      console.error("Registration error:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Something went wrong");
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
+      <h2 className="text-2xl font-bold mb-4">Register</h2>
+      {error && <p className="text-red-500 mb-2">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="border p-2 w-full rounded"
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border p-2 w-full rounded"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="border p-2 w-full rounded"
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded w-full"
+        >
+          Register
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default Register;
+
+
+----app.jsx
+
+
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AIGenerator from "./pages/AIGenerator"
+
+import Landing from "./pages/Landing";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/home" element={<Home/>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/ai" element={<AIGenerator />} /> 
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+frontend/src/components/CreatePost
+
+import React, { useState } from "react";
+import API from "../api";
+import {jwtDecode} from "jwt-decode";
+
+const CreatePost = ({ onPostCreated }) => {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [tags, setTags] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login first.");
+        return;
+      }
+
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+
+      const res = await API.post(
+        "/api/blogs",
+        { title, content, userId, tags: tags.split(",").map((t) => t.trim()) },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      onPostCreated(res.data);
+      setTitle("");
+      setContent("");
+      setTags("");
+    } catch (err) {
+      console.error("Error creating post:", err);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="mb-4 p-4 border rounded">
+      <input
+        type="text"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="border p-2 w-full mb-2"
+      />
+      <textarea
+        placeholder="Content"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        className="border p-2 w-full mb-2"
+      />
+      <input
+        type="text"
+        placeholder="Tags (comma separated)"
+        value={tags}
+        onChange={(e) => setTags(e.target.value)}
+        className="border p-2 w-full mb-2"
+      />
+      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+        Create Post
+      </button>
+    </form>
+  );
+};
+
+export default CreatePost;
+
+
+
+frontend/src/components/PostList.jsx
+
+
+import React, { useState } from "react";
+import API from "../api";
+
+const PostList = ({ posts, onUpdatePost, onDeletePost }) => {
+  const [editingId, setEditingId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+
+  const startEditing = (post) => {
+    setEditingId(post._id);
+    setEditTitle(post.title);
+    setEditContent(post.content);
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditTitle("");
+    setEditContent("");
+  };
+
+  const saveEdit = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You must login first");
+        return;
+      }
+
+      const res = await API.put(
+        `/api/blogs/${id}`,
+        { title: editTitle, content: editContent },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      onUpdatePost(res.data); // Call the parent function to update state
+      cancelEditing();
+    } catch (err) {
+      console.error("Error updating post:", err);
+    }
+  };
+
+  const deletePost = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You must login first");
+      return;
+    }
+
+    try {
+      await API.delete(`/api/blogs/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      onDeletePost(id); // Call parent function to remove post from state
+    } catch (err) {
+      console.error("Error deleting post:", err);
+    }
+  };
+
+  if (!posts || posts.length === 0) return <p>No posts available.</p>;
+
+  return (
+    <div className="space-y-4">
+      {posts.map((post) => (
+        <div key={post._id} className="border p-4 rounded">
+          {editingId === post._id ? (
+            <div>
+              <input
+                className="border p-2 w-full mb-2"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
+              <textarea
+                className="border p-2 w-full mb-2"
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+              />
+              <button
+                className="bg-green-500 text-white px-3 py-1 mr-2 rounded"
+                onClick={() => saveEdit(post._id)}
+              >
+                Save
+              </button>
+              <button
+                className="bg-gray-400 text-white px-3 py-1 rounded"
+                onClick={cancelEditing}
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <div>
+              <h2 className="text-xl font-semibold">{post.title}</h2>
+              <p>{post.content}</p>
+              <div className="mt-2 space-x-2">
+                <button
+                  className="bg-yellow-400 text-white px-3 py-1 rounded"
+                  onClick={() => startEditing(post)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded"
+                  onClick={() => deletePost(post._id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default PostList;
+
+
