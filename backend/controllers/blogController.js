@@ -1,6 +1,5 @@
 import Blog from "../models/Blog.js";
 
-// Get all blogs
 export const getAllBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find().sort({ createdAt: -1 });
@@ -10,7 +9,7 @@ export const getAllBlogs = async (req, res) => {
   }
 };
 
-// Get blog by ID
+
 export const getBlogById = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
@@ -32,7 +31,7 @@ export const getBlogsByUser = async (req, res) => {
   }
 };
 
-// Create blog
+
 
 export const createBlog = async (req, res) => {
   const { title, content, tags = [] } = req.body;
@@ -40,7 +39,7 @@ export const createBlog = async (req, res) => {
     if (!req.user) return res.status(401).json({ message: "Not authorized" });
 
     const blog = await Blog.create({
-      userId: req.user._id, // from middleware
+      userId: req.user._id, 
       title,
       content,
       tags,
@@ -55,7 +54,7 @@ export const createBlog = async (req, res) => {
 
 
 
-// Update blog
+
 export const updateBlog = async (req, res) => {
   try {
     const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
@@ -72,7 +71,7 @@ export const updateBlog = async (req, res) => {
 };
 
 
-// Delete blog
+
 export const deleteBlog = async (req, res) => {
   try {
     const blog = await Blog.findByIdAndDelete(req.params.id);
