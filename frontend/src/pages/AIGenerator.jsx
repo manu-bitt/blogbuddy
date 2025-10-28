@@ -15,7 +15,7 @@ const AIGenerator = ({ onNewPost }) => {
     if (!token) navigate("/login");
   }, [navigate]);
 
-  // Generate AI blog
+  
   const handleGenerate = async (e) => {
     e.preventDefault();
     if (!topic.trim()) return alert("Please enter a topic.");
@@ -37,7 +37,7 @@ const AIGenerator = ({ onNewPost }) => {
     }
   };
 
-  // Save generated blog
+ 
   const handleSave = async () => {
     if (!content.trim()) return alert("No content to save.");
     const token = localStorage.getItem("token");
@@ -54,7 +54,7 @@ const AIGenerator = ({ onNewPost }) => {
       setTopic("");
       setContent("");
 
-      // ✅ Trigger sidebar update
+      
       if (onNewPost) onNewPost(res.data);
     } catch (err) {
       console.error("Save failed:", err);
