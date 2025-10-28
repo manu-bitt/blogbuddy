@@ -23,7 +23,7 @@ const AIGenerator = ({ onNewPost }) => {
     setLoading(true);
     setContent("");
     try {
-      const res = await API.post("/api/ai/generate", {
+      const res = await API.post("/ai/generate", {
         topic,
         tone,
         maxTokens: 700,

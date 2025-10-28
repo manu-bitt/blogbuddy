@@ -31,7 +31,7 @@ const EditBlog = () => {
       if (!token) return alert("Please login first.");
 
       await API.put(
-        `/api/blogs/${id}`,
+        `/blogs/${id}`,
         { title, content, tags: tags.split(",").map((t) => t.trim()) },
         { headers: { Authorization: `Bearer ${token}` } }
       );

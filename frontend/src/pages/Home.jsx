@@ -23,7 +23,7 @@ const Home = () => {
 
       const userId = JSON.parse(atob(token.split(".")[1])).id;
 
-      const res = await API.get(`/api/blogs/user/${userId}`, {
+      const res = await API.get(`/blogs/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
