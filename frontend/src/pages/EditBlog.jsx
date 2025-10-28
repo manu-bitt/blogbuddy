@@ -37,7 +37,7 @@ const EditBlog = () => {
       );
 
       alert("Blog updated successfully!");
-      navigate("/home"); // go back to home
+      navigate("/home"); 
     } catch (err) {
       console.error(err);
       alert("Failed to update blog.");
