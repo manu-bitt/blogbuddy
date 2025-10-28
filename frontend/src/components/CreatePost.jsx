@@ -21,7 +21,7 @@ const CreateBlog = ({ onBlogCreated }) => {
       const userId = decoded.id;
 
       const res = await API.post(
-        "/api/blogs",
+        "/blogs",
         { title, content, userId, tags: tags.split(",").map((t) => t.trim()) },
         { headers: { Authorization: `Bearer ${token}` } }
       );

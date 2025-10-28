@@ -17,7 +17,7 @@ const PostList = ({ posts, onDeletePost }) => {
     const token = localStorage.getItem("token");
     if (!token) return alert("Please login first.");
     try {
-      await API.delete(`/api/blogs/${id}`, {
+      await API.delete(`/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       onDeletePost(id);
