@@ -13,7 +13,7 @@ const PostList = ({ posts, onDeletePost }) => {
   };
 
   const handleDelete = async (e, id) => {
-    e.stopPropagation(); // prevent triggering note click
+    e.stopPropagation(); 
     const token = localStorage.getItem("token");
     if (!token) return alert("Please login first.");
     try {
