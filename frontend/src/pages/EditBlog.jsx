@@ -13,7 +13,7 @@ const EditBlog = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await API.get(`/api/blogs/${id}`);
+        const res = await API.get(`/blogs/${id}`);
         setTitle(res.data.title);
         setContent(res.data.content);
         setTags(res.data.tags.join(", "));
