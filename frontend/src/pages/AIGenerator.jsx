@@ -45,7 +45,7 @@ const AIGenerator = ({ onNewPost }) => {
 
     try {
       const res = await API.post(
-        "/api/blogs",
+        "/blogs",
         { title: topic.trim(), content, tags: [] },
         { headers: { Authorization: `Bearer ${token}` } }
       );
