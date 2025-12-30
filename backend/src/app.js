@@ -9,14 +9,14 @@ import aiRoutes from '../routes/aiRoutes.js'
 dotenv.config()
 const app = express()
 
-app.use(cors())
+app.use(express.json())
 
 app.use(cors({
-  origin: "*",
+  origin: ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"],
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
-app.use(express.json())
 
 
 app.use("/api/auth",authRoutes);

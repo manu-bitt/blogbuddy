@@ -10,9 +10,14 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 
 export const generateBlog = async (req, res) => {
-
   try {
     const { topic, tone = "informative", maxTokens = 700 } = req.body;
+
+    if (!process.env.OPENAI_API_KEY) {
+        return res.status(503).json({ 
+            message: "AI Generation is currently unavailable (Missing API Key). Please create a manual blog or contact admin." 
+        });
+    }
 
     if (!topic || typeof topic !== "string" || topic.trim().length < 3) {
       return res.status(400).json({ message: "Topic is required and should be at least 3 characters." });
@@ -34,7 +39,6 @@ export const generateBlog = async (req, res) => {
 
     const content = completion.choices?.[0]?.message?.content?.trim() ?? "";
 
-    
     if (!content) {
       return res.status(500).json({ message: "AI returned empty content." });
     }
